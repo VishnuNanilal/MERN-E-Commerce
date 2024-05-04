@@ -9,10 +9,11 @@ const sellerSchema = new mongoose.Schema({
     name: String,
     rating: Number,
     address: String,
-    inventory: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'products'
-    }]
+    inventory: [{type: String}] //temporary String type, change to below later.
+    // inventory: [{
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'products'
+    // }]
 })
 
 module.exports = mongoose.model('sellers', sellerSchema)
