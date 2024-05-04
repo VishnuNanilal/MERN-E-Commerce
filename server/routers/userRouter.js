@@ -5,6 +5,6 @@ const JWTAuthorize = require('../MiddleWares/JWTAuth')
 router.post('/register', userCtrl.register)
 router.get('/sign-in', userCtrl.signIn)
 router.get('/authorize',JWTAuthorize, userCtrl.authorize)
-router.get('/add-item', userCtrl.AddItemToCart)
+// router.get('/add-item', userCtrl.AddItemToCart)
 
 module.exports=router

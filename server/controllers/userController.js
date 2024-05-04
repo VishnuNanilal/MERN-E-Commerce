@@ -111,32 +111,32 @@ async function authorize(req, res) {
     }
 }
 
-async function AddItemToCart(req, res){
-    try{
-        let response = await User.findByIdAndUpdate(req.body.id, {$push: {orders: req.params}}, {new: true})
-        if(response){
-            res.status(201).send({
-                success: true,
-                message: "Item added to cart",
-                data: response
-            })
-        }
-        else{
-            res.status(404).send({
-                success: false,
-                message: "Item adding to cart failed.",
-                data: response
-            })
-        }
-    }
-    catch(err){
-        console.log("Adding item to cart failed on BE.")
-    }
-}
+// async function AddItemToCart(req, res){
+//     try{
+//         let response = await User.findByIdAndUpdate(req.body.id, {$push: {orders: req.params}}, {new: true})
+//         if(response){
+//             res.status(201).send({
+//                 success: true,
+//                 message: "Item added to cart",
+//                 data: response
+//             })
+//         }
+//         else{
+//             res.status(404).send({
+//                 success: false,
+//                 message: "Item adding to cart failed.",
+//                 data: response
+//             })
+//         }
+//     }
+//     catch(err){
+//         console.log("Adding item to cart failed on BE.")
+//     }
+// }
 
 module.exports = {
     register,
     signIn,
     authorize,
-    AddItemToCart
+    // AddItemToCart
 }
