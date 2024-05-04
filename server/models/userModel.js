@@ -2,26 +2,32 @@ const mongoose = require('mongoose')
 
 const usersSchema = new mongoose.Schema({
     name: {
-        type: String, 
+        type: String,
         required: true
     },
     email: {
-        type: String, 
+        type: String,
         required: true
     },
     password: {
-        type: String, 
+        type: String,
         required: true
     },
     orders: [{
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "orders"
+        product: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "orders"
+        },
+        quantity: {
+            type: Number,
+            required: true
+        }
     }],
     address: {
-        type: String, 
+        type: String,
     },
     phone_no: {
-        type: Number, 
+        type: Number,
         required: true
     },
     city: String

@@ -1,7 +1,6 @@
 const User = require('../models/userModel')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const JWTAuth = require('../MiddleWares/JWTAuth')
 
 async function register(req, res) {
     try {
@@ -62,10 +61,10 @@ async function signIn(req, res) {
         }
 
         let response = emailResponse || phoneResponse;
+        console.log("sign in response: ",response)
         
-        response = await bcrypt.compare(password, response.password)
-        console.log(">>>", response)
-        if (response) {
+        let isVerified = await bcrypt.compare(password, response.password)
+        if (isVerified) {
             //create jwt and send to front end
             response = jwt.sign({id: response._id, password}, process.env.jwt_key)
             res.status(201).send({
@@ -86,8 +85,9 @@ async function signIn(req, res) {
     }
 }
 
-async function authorize(req, JWTAuthorize, res) {
+async function authorize(req, res) {
     try {
+        console.log(">>><<<", req.body)
         let response = await User.findById(req.body.id).select("-password")
         .populate("orders")
         .exec()
@@ -111,8 +111,32 @@ async function authorize(req, JWTAuthorize, res) {
     }
 }
 
+async function AddItemToCart(req, res){
+    try{
+        let response = await User.findByIdAndUpdate(req.body.id, {$push: {orders: req.params}}, {new: true})
+        if(response){
+            res.status(201).send({
+                success: true,
+                message: "Item added to cart",
+                data: response
+            })
+        }
+        else{
+            res.status(404).send({
+                success: false,
+                message: "Item adding to cart failed.",
+                data: response
+            })
+        }
+    }
+    catch(err){
+        console.log("Adding item to cart failed on BE.")
+    }
+}
+
 module.exports = {
     register,
     signIn,
-    authorize
+    authorize,
+    AddItemToCart
 }
