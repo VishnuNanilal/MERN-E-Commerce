@@ -1,6 +1,7 @@
 const User = require('../models/userModel')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const JWTAuth = require('../MiddleWares/JWTAuth')
 
 async function register(req, res) {
     try {
@@ -63,9 +64,10 @@ async function signIn(req, res) {
         let response = emailResponse || phoneResponse;
         
         response = await bcrypt.compare(password, response.password)
+        console.log(">>>", response)
         if (response) {
             //create jwt and send to front end
-            response = jwt.sign({credential: email||phone_no, password}, process.env.jwt_key)
+            response = jwt.sign({id: response._id, password}, process.env.jwt_key)
             res.status(201).send({
                 success: true,
                 message: "User signed in successfully.",
@@ -84,7 +86,33 @@ async function signIn(req, res) {
     }
 }
 
+async function authorize(req, JWTAuthorize, res) {
+    try {
+        let response = await User.findById(req.body.id).select("-password")
+        .populate("orders")
+        .exec()
+
+        if (response) {
+            res.status(201).send({
+                success: true,
+                message: "User authorization successful.",
+                data: response
+            })
+        }
+        else {
+            res.status(404).send({
+                success: false,
+                message: "User authorization failed.",
+            })
+        }
+    }
+    catch(err){
+        console.log("User authorization failed on DB.")
+    }
+}
+
 module.exports = {
     register,
-    signIn
+    signIn,
+    authorize
 }
