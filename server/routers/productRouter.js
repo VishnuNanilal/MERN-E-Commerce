@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const productCtrl = require('../controllers/productController')
 
-router.post('/add-product', productCtrl.CreateProduct)
+router.post('/create-product', productCtrl.CreateProduct)
 
 module.exports = router

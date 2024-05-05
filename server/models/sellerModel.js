@@ -8,12 +8,13 @@ const sellerSchema = new mongoose.Schema({
     },
     name: String,
     rating: Number,
-    address: String,
-    inventory: [{type: String}] //temporary String type, change to below later.
-    // inventory: [{
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'products'
-    // }]
+    inventory: [{
+        product_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'products'
+        },
+        quantity: Number
+    }]
 })
 
 module.exports = mongoose.model('sellers', sellerSchema)

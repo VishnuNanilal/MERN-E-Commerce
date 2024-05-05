@@ -23,10 +23,22 @@ async function register(req, res){
     }
 }
 
-async function UpdateInventory(req, res){
+async function UpdateInventoryAddItem(req, res){
+   
+    /*
+    inventoryItems is of the form {
+        product_id: 
+        quantity: 
+    }
+    */
+    console.log(">>>",req.body)
     try{
-        let response = await Seller.findOneAndUpdate({user_id: req.body.user_id}, {inventory: req.body.inventory}, {new: true})
+        let response = await Seller.findByIdAndUpdate(req.body.seller_id, 
+            {$push: {inventory: req.body.inventoryItems}}, {new: true})
+            .populate("inventory.product_id")
+            .exec()
 
+        console.log("...",response)
         if(response){
             res.status(201).send({
                 success: true,
@@ -48,5 +60,5 @@ async function UpdateInventory(req, res){
 
 module.exports = {
     register,
-    UpdateInventory
+    UpdateInventoryAddItem
 }
