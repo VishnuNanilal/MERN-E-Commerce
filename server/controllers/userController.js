@@ -1,4 +1,5 @@
 const User = require('../models/userModel')
+const Order = require('../models/oderModel')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
@@ -111,32 +112,64 @@ async function authorize(req, res) {
     }
 }
 
-// async function AddItemToCart(req, res){
-//     try{
-//         let response = await User.findByIdAndUpdate(req.body.id, {$push: {orders: req.params}}, {new: true})
-//         if(response){
-//             res.status(201).send({
-//                 success: true,
-//                 message: "Item added to cart",
-//                 data: response
-//             })
-//         }
-//         else{
-//             res.status(404).send({
-//                 success: false,
-//                 message: "Item adding to cart failed.",
-//                 data: response
-//             })
-//         }
-//     }
-//     catch(err){
-//         console.log("Adding item to cart failed on BE.")
-//     }
-// }
+async function MakeOrder(req, res){
+    console.log("reached", req.body)
+    
+    let {user_id, product_id, delivery_date, shipping_address, quantity, amount} = req.body
+    try{
+        let response = await Order.create({
+            product_id,
+            delivery_date,
+            shipping_address,
+            quantity,
+            amount,
+            status: "Pending"
+        })
+
+        if(response){
+            await AddItemToUserOrders(user_id, response.id)
+            res.status(201).send({
+              success: true,
+              message: "Order creation successful.",
+              data: response  
+            })
+        }
+        else{
+            res.status(404).send({
+            success: false,
+            message: "Order creation failed.",
+            })
+        }
+    }
+    catch(err){
+        console.log("Order creation failed on BE.")
+    }
+}
+
+async function AddItemToUserOrders(user_id, order_id){
+    /* data: {
+        user_id:
+        order_id:
+    }
+    */
+   try{
+       let response = await User.findByIdAndUpdate(user_id, {$push: {orders: order_id}}, {new: true})
+       if(response){
+            console.log("Order was added to user order list.")
+        }
+        else{
+            console.log("Order was not added to user order list.")
+        }
+    }
+    catch(err){
+        console.log("Adding item to user orders failed on DB.")
+    }
+}
 
 module.exports = {
     register,
     signIn,
     authorize,
-    // AddItemToCart
+    MakeOrder,
+    AddItemToUserOrders,
 }

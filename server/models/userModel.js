@@ -14,14 +14,8 @@ const usersSchema = new mongoose.Schema({
         required: true
     },
     orders: [{
-        product: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "orders"
-        },
-        quantity: {
-            type: Number,
-            required: true
-        }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "orders"
     }],
     address: {
         type: String,

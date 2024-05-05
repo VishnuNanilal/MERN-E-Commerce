@@ -58,7 +58,6 @@ async function UpdateInventoryAddItem(req, res){
     }
 }
 
-
 async function UpdateInventoryReduceItem(req, res){
     /*
     req.body is of the form {
