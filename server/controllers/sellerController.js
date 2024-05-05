@@ -107,8 +107,44 @@ async function UpdateInventoryReduceItem(req, res){
     }
 }
 
+async function UpdateInventoryRemoveItem(req, res){
+   
+    /*
+    inventoryItems is of the form {
+        seller_id:
+        product_id: 
+    }
+    */
+    console.log(">>>",req.body)
+    try{
+        let response = await Seller.findByIdAndUpdate(req.body.seller_id, 
+            {$pull: {inventory: req.body.inventoryItems}}, {new: true})
+            .populate("inventory.product_id")
+            .exec()
+
+        console.log("...",response)
+        if(response){
+            res.status(201).send({
+                success: true,
+                message: "Inventory updation removal successful.",
+                data: response
+            })
+        }
+        else{
+            res.status(404).send({
+                success: false,
+                message: "Inventory updation removal failed on DB."
+            })
+        }
+    }
+    catch(err){
+        console.log("Inventory updation removal failed on Back End.")
+    }
+}
+
 module.exports = {
     register,
     UpdateInventoryAddItem,
-    UpdateInventoryReduceItem
+    UpdateInventoryReduceItem,
+    UpdateInventoryRemoveItem
 }
