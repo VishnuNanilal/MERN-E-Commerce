@@ -42,14 +42,63 @@ async function UpdateInventoryAddItem(req, res){
         if(response){
             res.status(201).send({
                 success: true,
-                message: "Inventory updation successful.",
+                message: "Inventory updation addition successful.",
                 data: response
             })
         }
         else{
             res.status(404).send({
                 success: false,
-                message: "Inventory updation failed on DB."
+                message: "Inventory updation addition failed on DB."
+            })
+        }
+    }
+    catch(err){
+        console.log("Inventory updation addition failed on Back End.")
+    }
+}
+
+
+async function UpdateInventoryReduceItem(req, res){
+    /*
+    req.body is of the form {
+        seller_id:
+        product_id: 
+        quantity: //reduce quantity
+    }
+    */
+    try{
+        let seller = await Seller.findById(req.body.seller_id)
+        if(seller){
+            let inventoryItem = seller.inventory.find(inventoryItem=>inventoryItem.product_id+""==req.body.product_id+"")
+            if(!inventoryItem){
+                res.status(404).send({
+                    success: false,
+                    message: "Inventory updation reduction failed on DB. Product was not found"
+                })
+                return;
+            }
+
+            if(inventoryItem.quantity<req.body.quantity){ //Implement on FE to make sure not to be able to reduce more than available quantity.
+                res.status(404).send({
+                    success: false,
+                    message: "Inventory updation failed on DB. Reduce quantity less than product quantity."
+                })
+                return;
+            }
+
+            inventoryItem.quantity -= req.body.quantity
+            response = await seller.save()
+            res.status(201).send({
+                success: true,
+                message: "Inventory updation reduction successful.",
+                data: response
+            })
+        }
+        else{
+            res.status(404).send({
+                success: false,
+                message: "Inventory updation reduction failed on DB. Seller was not found"
             })
         }
     }
@@ -60,5 +109,6 @@ async function UpdateInventoryAddItem(req, res){
 
 module.exports = {
     register,
-    UpdateInventoryAddItem
+    UpdateInventoryAddItem,
+    UpdateInventoryReduceItem
 }
