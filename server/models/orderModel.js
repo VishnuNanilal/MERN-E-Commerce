@@ -6,6 +6,7 @@ const orderSchema = new mongoose.Schema({
         ref: 'products'
     },
     delivery_date: String,
+    current_location: String,
     shipping_address: String,
     quantity: {
         type: Number,

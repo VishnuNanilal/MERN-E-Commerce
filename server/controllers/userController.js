@@ -1,5 +1,5 @@
 const User = require('../models/userModel')
-const Order = require('../models/oderModel')
+const Order = require('../models/orderModel')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
@@ -113,8 +113,6 @@ async function authorize(req, res) {
 }
 
 async function MakeOrder(req, res){
-    console.log("reached", req.body)
-    
     let {user_id, product_id, delivery_date, shipping_address, quantity, amount} = req.body
     try{
         let response = await Order.create({
@@ -127,7 +125,7 @@ async function MakeOrder(req, res){
         })
 
         if(response){
-            await AddItemToUserOrders(user_id, response.id)
+            await AUXAddItemToUserOrders(user_id, response.id)
             res.status(201).send({
               success: true,
               message: "Order creation successful.",
@@ -146,12 +144,13 @@ async function MakeOrder(req, res){
     }
 }
 
-async function AddItemToUserOrders(user_id, order_id){
+async function AUXAddItemToUserOrders(user_id, order_id){
     /* data: {
         user_id:
         order_id:
     }
     */
+
    try{
        let response = await User.findByIdAndUpdate(user_id, {$push: {orders: order_id}}, {new: true})
        if(response){
@@ -166,10 +165,51 @@ async function AddItemToUserOrders(user_id, order_id){
     }
 }
 
+async function RemoveOrder(req, res){
+    let {user_id, order_id} = req.body
+    try{
+        let response = await User.findByIdAndUpdate(user_id, {$pull: {orders: order_id}}, {new:true})
+
+        if(response){
+            await AUXDeleteOrder(order_id)
+            res.status(201).send({
+                success: true,
+                message: "Order removal successful.",
+                })
+        }
+        else{
+            res.status(404).send({
+            success: false,
+            message: "Order removal failed.",
+            })
+        }
+    }
+    catch(err){
+        console.log("Order creation failed on BE.")
+    }
+}
+
+async function AUXDeleteOrder(order_id){
+    try{
+        let response = await Order.findByIdAndDelete(order_id)
+        if(response){
+            console.log("Order was removed from DB")
+            return true
+        }
+        else{
+            console.log("Order removal from DB failed.")
+            return false
+        }
+    }
+    catch(err){
+        console.log("Order Deletion failed on DB.")
+    }
+}
+
 module.exports = {
     register,
     signIn,
     authorize,
     MakeOrder,
-    AddItemToUserOrders,
+    RemoveOrder
 }
