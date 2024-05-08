@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "start": "npm install",
-    "build": "cd server && nodemon index.js"
+    "build": "npm install",
+    "start": "cd server && nodemon index.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
