@@ -1,6 +1,6 @@
 const Product = require('../models/productModel')
 
-async function CreateProduct(req, res){
+const CreateProduct = async (req, res)=>{
     try{
         let response = await Product.create(req.body)
         console.log("productController.js>>>", response)
@@ -23,7 +23,30 @@ async function CreateProduct(req, res){
     }
 }
 
-async function DeleteProduct(req, res){
+const UpdateProduct = async (req, res)=>{
+    try{
+        let response = await Product.findByIdAndUpdate(req.body.id, req.body)
+        console.log("productController.js>>>", response)
+        if(response){
+            res.status(201).send({
+                success: true,
+                message: "Product updation successful.",
+                data: response
+            })
+        }
+        else{
+            res.status(404).send({
+                success: false,
+                message: "Product updation  failed on DB."
+            })
+        }
+    }
+    catch(err){
+        console.log("Product updation failed on Back End.")
+    }
+}
+
+const DeleteProduct = async (req, res)=>{
     try{
         let response = await Product.findByIdAndDelete(req.body.product_id)
         console.log("productController.js>>>", response)
@@ -47,5 +70,6 @@ async function DeleteProduct(req, res){
 }
 
 module.exports = {
-    CreateProduct
+    CreateProduct,
+    DeleteProduct
 }

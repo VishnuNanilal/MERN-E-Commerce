@@ -3,8 +3,7 @@ const Order = require('../models/orderModel')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
-async function register(req, res) {
-    console.log("xxx reached")
+const register = async (req, res) => {
     try {
         let { name, email, password, address, phone_no, city } = req.body;
         let response = await User.findOne({ email })
@@ -43,15 +42,14 @@ async function register(req, res) {
             })
         }
     }
-    catch(err){
+    catch (err) {
         console.log("User registration failed on DB.")
     }
 }
 
-async function signIn(req, res) {
+const signIn = async (req, res) => {
     try {
         let { email, phone_no, password } = req.body;
-        console.log("reached")
         let emailResponse = await User.findOne({ email })
         let phoneResponse = await User.findOne({ phone_no })
         if (!emailResponse && !phoneResponse) {
@@ -63,12 +61,12 @@ async function signIn(req, res) {
         }
 
         let response = emailResponse || phoneResponse;
-        console.log("sign in response: ",response)
-        
+        console.log("sign in response: ", response)
+
         let isVerified = await bcrypt.compare(password, response.password)
         if (isVerified) {
             //create jwt and send to front end
-            response = jwt.sign({id: response._id, password}, process.env.jwt_key)
+            response = jwt.sign({ id: response._id, password }, process.env.jwt_key)
             res.status(201).send({
                 success: true,
                 message: "User signed in successfully.",
@@ -82,17 +80,16 @@ async function signIn(req, res) {
             })
         }
     }
-    catch(err){
+    catch (err) {
         console.log("User registration failed on DB.")
     }
 }
 
-async function authorize(req, res) {
+const authorize = async (req, res) => {
     try {
-        console.log(">>><<<", req.body)
         let response = await User.findById(req.body.id).select("-password")
-        .populate("orders")
-        .exec()
+            .populate("orders")
+            .exec()
 
         if (response) {
             res.status(201).send({
@@ -108,14 +105,14 @@ async function authorize(req, res) {
             })
         }
     }
-    catch(err){
+    catch (err) {
         console.log("User authorization failed on DB.")
     }
 }
 
-async function MakeOrder(req, res){
-    let {user_id, product_id, delivery_date, shipping_address, quantity, amount} = req.body
-    try{
+    const MakeOrder = async (req, res) => {
+    let { user_id, product_id, delivery_date, shipping_address, quantity, amount } = req.body
+    try {
         let response = await Order.create({
             product_id,
             delivery_date,
@@ -125,84 +122,84 @@ async function MakeOrder(req, res){
             status: "Pending"
         })
 
-        if(response){
+        if (response) {
             await AUXAddItemToUserOrders(user_id, response.id)
             res.status(201).send({
-              success: true,
-              message: "Order creation successful.",
-              data: response  
+                success: true,
+                message: "Order creation successful.",
+                data: response
             })
         }
-        else{
+        else {
             res.status(404).send({
-            success: false,
-            message: "Order creation failed.",
+                success: false,
+                message: "Order creation failed.",
             })
         }
     }
-    catch(err){
+    catch (err) {
         console.log("Order creation failed on BE.")
     }
 }
 
-async function AUXAddItemToUserOrders(user_id, order_id){
+async function AUXAddItemToUserOrders(user_id, order_id) {
     /* data: {
         user_id:
         order_id:
     }
     */
 
-   try{
-       let response = await User.findByIdAndUpdate(user_id, {$push: {orders: order_id}}, {new: true})
-       if(response){
+    try {
+        let response = await User.findByIdAndUpdate(user_id, { $push: { orders: order_id } }, { new: true })
+        if (response) {
             console.log("Order was added to user order list.")
         }
-        else{
+        else {
             console.log("Order was not added to user order list.")
         }
     }
-    catch(err){
+    catch (err) {
         console.log("Adding item to user orders failed on DB.")
     }
 }
 
-async function RemoveOrder(req, res){
-    let {user_id, order_id} = req.body
-    try{
-        let response = await User.findByIdAndUpdate(user_id, {$pull: {orders: order_id}}, {new:true})
+const RemoveOrder = async (req, res)=> {
+    let { user_id, order_id } = req.body
+    try {
+        let response = await User.findByIdAndUpdate(user_id, { $pull: { orders: order_id } }, { new: true })
 
-        if(response){
+        if (response) {
             await AUXDeleteOrder(order_id)
             res.status(201).send({
                 success: true,
                 message: "Order removal successful.",
-                })
+            })
         }
-        else{
+        else {
             res.status(404).send({
-            success: false,
-            message: "Order removal failed.",
+                success: false,
+                message: "Order removal failed.",
             })
         }
     }
-    catch(err){
+    catch (err) {
         console.log("Order creation failed on BE.")
     }
 }
 
-async function AUXDeleteOrder(order_id){
-    try{
+async function AUXDeleteOrder(order_id) {
+    try {
         let response = await Order.findByIdAndDelete(order_id)
-        if(response){
+        if (response) {
             console.log("Order was removed from DB")
             return true
         }
-        else{
+        else {
             console.log("Order removal from DB failed.")
             return false
         }
     }
-    catch(err){
+    catch (err) {
         console.log("Order Deletion failed on DB.")
     }
 }
