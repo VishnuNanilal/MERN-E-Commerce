@@ -12,14 +12,14 @@ const register = async (req, res) => {
             })
         }
         else {
-            res.status(404).send({
+            res.status(400).send({
                 success: false,
                 message: "Seller registration failed on DB."
             })
         }
     }
     catch (err) {
-        console.log("Seller registration failed on Back End.")
+        console.log("Error: ", err)
     }
 }
 
@@ -39,21 +39,21 @@ const UpdateInventoryAddItem = async (req, res) => {
 
         console.log("...", response)
         if (response) {
-            res.status(201).send({
+            res.status(200).send({
                 success: true,
                 message: "Inventory updation addition successful.",
                 data: response
             })
         }
         else {
-            res.status(404).send({
+            res.status(400).send({
                 success: false,
                 message: "Inventory updation addition failed on DB."
             })
         }
     }
     catch (err) {
-        console.log("Inventory updation addition failed on Back End.")
+        console.log("Error: ", err)
     }
 }
 
@@ -70,7 +70,7 @@ const UpdateInventoryReduceItem = async (req, res) => {
         if (seller) {
             let inventoryItem = seller.inventory.find(inventoryItem => inventoryItem.product_id + "" == req.body.product_id + "")
             if (!inventoryItem) {
-                res.status(404).send({
+                res.status(400).send({
                     success: false,
                     message: "Inventory updation reduction failed on DB. Product was not found"
                 })
@@ -78,7 +78,7 @@ const UpdateInventoryReduceItem = async (req, res) => {
             }
 
             if (inventoryItem.quantity < req.body.quantity) { //Implement on FE to make sure not to be able to reduce more than available quantity.
-                res.status(404).send({
+                res.status(400).send({
                     success: false,
                     message: "Inventory updation failed on DB. Reduce quantity less than product quantity."
                 })
@@ -87,21 +87,21 @@ const UpdateInventoryReduceItem = async (req, res) => {
 
             inventoryItem.quantity -= req.body.quantity
             response = await seller.save()
-            res.status(201).send({
+            res.status(200).send({
                 success: true,
                 message: "Inventory updation reduction successful.",
                 data: response
             })
         }
         else {
-            res.status(404).send({
+            res.status(400).send({
                 success: false,
                 message: "Inventory updation reduction failed on DB. Seller was not found"
             })
         }
     }
     catch (err) {
-        console.log("Inventory updation failed on Back End.")
+        console.log("Error: ", err)
     }
 }
 
@@ -122,21 +122,21 @@ const UpdateInventoryRemoveItem = async (req, res) => {
 
         console.log("...", response)
         if (response) {
-            res.status(201).send({
+            res.status(200).send({
                 success: true,
                 message: "Inventory updation removal successful.",
                 data: response
             })
         }
         else {
-            res.status(404).send({
+            res.status(400).send({
                 success: false,
                 message: "Inventory updation removal failed on DB."
             })
         }
     }
     catch (err) {
-        console.log("Inventory updation removal failed on Back End.")
+        console.log("Error: ", err)
     }
 }
 
